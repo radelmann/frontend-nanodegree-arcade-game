@@ -51,6 +51,7 @@ Enemy.prototype.update = function(dt) {
 var Player = function() {
     Person.call(this, 200, 410, 'images/char-boy.png');
     this.score = 0;
+    this.flashing = false;
 }
 
 Player.prototype = Object.create(Person.prototype);
@@ -61,35 +62,38 @@ Player.prototype.reset = function() {
     this.y = 410;
 }
 
-Player.prototype.collide = function() {
+Player.prototype.handleCollide = function() {
     this.reset();
     this.score = 0;
 }
 
 Player.prototype.update = function() {
-    //check if player is in the blue section
-    //if so, add 10 to score and reset position
-    if (this.y < 0) {
-        this.score +=10;
-        console.log(this.score);
+    if ((this.y < 0) && (!this.flashing)) {
+        this.score += 10;
+        this.flashed = Resources.now();
+        this.flashing = true;
+    } else if ((this.flashing) && (Resources.now() - this.flashed > 3000)){
         this.reset();
+        this.flashing = false;
     }
 };
 
 Player.prototype.handleInput = function(direction) {
-    switch (direction) {
-        case 'up':
-            if (this.y > 1) this.y -= 83;
-            break;
-        case 'down':
-            if (this.y < 410) this.y += 83;
-            break;
-        case 'left':
-            if (this.x > 0) this.x -= 101;
-            break;
-        case 'right':
-            if (this.x < 402) this.x += 101;
-            break;
+    if (!this.flashing) {
+        switch (direction) {
+            case 'up':
+                if (this.y > 1) this.y -= 83;
+                break;
+            case 'down':
+                if (this.y < 410) this.y += 83;
+                break;
+            case 'left':
+                if (this.x > 0) this.x -= 101;
+                break;
+            case 'right':
+                if (this.x < 402) this.x += 101;
+                break;
+        }
     }
 };
 
