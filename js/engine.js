@@ -85,16 +85,13 @@ var Engine = (function(global) {
 
     function checkCollisions() {
         //loop through enemy array and check if any is overlapping with player
-        function collides(a, b) {
-            return a.x < b.x + b.width &&
-                a.x + a.width > b.x &&
-                a.y < b.y + b.height &&
-                a.y + a.height > b.y;
+        function collides(enemy, player) {
+            return (enemy.x - 70 < player.x && enemy.x + 70 > player.x && enemy.y - 60 < player.y && enemy.y + 60 > player.y);
         }
 
         allEnemies.forEach(function(enemy) {
             if (collides(enemy, player)) {
-                player.reset();
+                player.collide();
             }
         });
     }

@@ -1,3 +1,14 @@
+//Person - generic super class
+var Person = function(x, y, sprite) {
+    this.sprite = sprite;
+    this.x = x;
+    this.y = y;
+}
+
+Person.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+}
+
 // Enemies our player must avoid
 var Enemy = function(x, y) {
     // Variables applied to each of our instances go here,
@@ -5,14 +16,12 @@ var Enemy = function(x, y) {
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
-    this.x = x;
-    this.y = y;
-    this.width = 101;
-    this.height = 77;
+    Person.call(this, x, y, 'images/enemy-bug.png');
     this.speed = this.getSpeed();
 };
 
+Enemy.prototype = Object.create(Person.prototype);
+Enemy.prototype.constructor = Person;
 
 Enemy.prototype.getSpeed = function() {
     function getRandomInt(min, max) {
@@ -36,35 +45,38 @@ Enemy.prototype.update = function(dt) {
     }
 };
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
-
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
-    this.sprite = 'images/char-boy.png';
-    this.x = 200;
-    this.y = 410;
-    this.width = 70;
-    this.height = 83;
+    Person.call(this, 200, 410, 'images/char-boy.png');
+    this.score = 0;
 }
+
+Player.prototype = Object.create(Person.prototype);
+Player.prototype.constructor = Person;
 
 Player.prototype.reset = function() {
     this.x = 200;
     this.y = 410;
 }
 
-Player.prototype.update = function() {};
+Player.prototype.collide = function() {
+    this.reset();
+    this.score = 0;
+}
 
-Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+Player.prototype.update = function() {
+    //check if player is in the blue section
+    //if so, add 10 to score and reset position
+    if (this.y < 0) {
+        this.score +=10;
+        console.log(this.score);
+        this.reset();
+    }
 };
 
 Player.prototype.handleInput = function(direction) {
-    //need to check position boundaries
     switch (direction) {
         case 'up':
             if (this.y > 1) this.y -= 83;
@@ -79,7 +91,6 @@ Player.prototype.handleInput = function(direction) {
             if (this.x < 402) this.x += 101;
             break;
     }
-    console.log(this.x + ',' + this.y);
 };
 
 
@@ -89,7 +100,7 @@ Player.prototype.handleInput = function(direction) {
 var player = new Player();
 
 var allEnemies = [];
-allEnemies.push(new Enemy(-100, 65));
+allEnemies.push(new Enemy(-100, 60));
 allEnemies.push(new Enemy(-100, 145));
 allEnemies.push(new Enemy(-100, 230));
 
